@@ -12,6 +12,8 @@ module Spina
                     :list_item_tag, :list_item_css, 
                     :link_tag_css,
                     :include_drafts,
+                    :controller,
+                    :target,
                     :depth # root nodes are at depth 0
 
     # Default configuration
@@ -19,6 +21,8 @@ module Spina
     self.list_tag = :ul
     self.list_item_tag = :li
     self.include_drafts = false
+    self.controller = "navigation"
+    self.target = "navigation.item"
 
     def initialize(collection)
       @collection = collection
@@ -36,7 +40,7 @@ module Spina
       end
 
       def render_menu(collection)
-        content_tag(menu_tag, class: menu_css) do
+        content_tag(menu_tag, class: menu_css, data: {controller: controller}) do
           render_items(scoped_collection(collection))
         end
       end
@@ -52,7 +56,7 @@ module Spina
       def render_item(item)
         children = scoped_collection(item.children)
 
-        content_tag(list_item_tag, class: list_item_css, data: {page_id: item.page_id, draft: (true if item.draft?) }) do
+        content_tag(list_item_tag, class: list_item_css, data: {page_id: item.page_id, target: target, draft: (true if item.draft?) }) do
           buffer = ActiveSupport::SafeBuffer.new
           buffer << link_to(item.menu_title, item.materialized_path, class: link_tag_css)
           buffer << render_items(children) if render_children?(item) && children.any?

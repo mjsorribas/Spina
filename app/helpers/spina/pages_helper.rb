@@ -13,5 +13,11 @@ module Spina
       Current.page
     end
 
+    def spina_body_tag(attributes = {}, &block)
+      attributes[:data] ||= {}
+      attributes[:data].merge!({current_page: current_page.id, ancestors: current_page.ancestor_ids.join('-')})
+      tag.body attributes, &block
+    end
+
   end
 end
